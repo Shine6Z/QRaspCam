@@ -13,7 +13,7 @@ resolution = QSize(1920, 1050);
 
   // Menu
   menu = menuBar();
-  QMenu *resolutionMenu = new QMenu("Resolution");
+  QMenu *resolutionMenu = new QMenu("Resolutions");
 
   QAction* resUltra = new QAction("Ultra");
   QAction* res1080 = new QAction("1080p");
@@ -61,6 +61,39 @@ resolution = QSize(1920, 1050);
   resolutionMenu->addAction(resLow);
 
   menu->addMenu(resolutionMenu);
+
+
+  QMenu *settingsMenu = new QMenu("Settings");
+
+  QAction* brightnessPlus = new QAction("More bright");
+  QAction* brightnessMinus = new QAction("Less bright");
+  brightnessPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+B")));
+  brightnessMinus->setShortcut(QKeySequence(tr("Ctrl+b")));
+  connect(brightnessPlus, &QAction::triggered, [this](){
+    camera->setBrightness(camera->getBrightness() + 1);
+  });
+  connect(brightnessMinus, &QAction::triggered, [this](){
+    camera->setBrightness(camera->getBrightness() - 1);
+  });
+  settingsMenu->addAction(brightnessPlus);
+  settingsMenu->addAction(brightnessMinus);
+  settingsMenu->addSeparator();
+
+  QAction* contrastPlus = new QAction("More contrast");
+  QAction* contrastMinus = new QAction("Less contrast");
+  contrastPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
+  contrastMinus->setShortcut(QKeySequence(tr("Ctrl+c")));
+  connect(contrastPlus, &QAction::triggered, [this](){
+    camera->setContrast(camera->getContrast() + 1);
+  });
+  connect(contrastMinus, &QAction::triggered, [this](){
+    camera->setContrast(camera->getContrast() - 1);
+  });
+  settingsMenu->addAction(contrastPlus);
+  settingsMenu->addAction(contrastMinus);
+  settingsMenu->addSeparator();
+
+  menu->addMenu(settingsMenu);
 
   newCamera();
 

@@ -28,3 +28,21 @@ Camera::~Camera(){
   camera->release();
   emit(finished());
 }
+    
+void Camera::setBrightness(int brightness){
+  camera->setBrightness(brightness);
+}
+
+int Camera::getBrightness(){
+  int brightness = camera->getBrightness();
+  return brightness;
+}
+    
+void Camera::setContrast(int contrast){
+  camera->setContrast(contrast);
+}
+
+int Camera::getContrast(){
+  int contrast = camera->getContrast();
+  return contrast;
+}

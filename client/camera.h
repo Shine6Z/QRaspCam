@@ -18,6 +18,10 @@ class Camera : public QObject{
 
   public slots:
     void start();
+    void setBrightness(int brightness);
+    int getBrightness();
+    void setContrast(int contrast);
+    int getContrast();
 
   private:
     raspicam::RaspiCam* camera;

@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QSize>
 #include <QAction>
+#include <QKeySequence>
 #include <QPushButton>
 #include <QMainWindow>
 
