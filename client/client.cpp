@@ -2,14 +2,19 @@
 
 
 Client::Client(QWidget *parent) : QMainWindow(parent){
-
+  QRect screen = QDesktopWidget().availableGeometry(this);
+  screenSize = QSize(screen.width(), screen.height());
+  this->setMaximumSize(screenSize);
+  this->setWindowState(Qt::WindowMaximized);
 
   // Window
-  ui_display = new QLabel(this);
-  ui_display->setText("test");
-  this->setCentralWidget(ui_display);
+  ui_scroll = new QScrollArea(this);
+  ui_display = new QLabel;
+  ui_scroll->setWidget(ui_display);
+  this->setCentralWidget(ui_scroll);
 
-resolution = QSize(1920, 1050);
+  resolution = QSize(1920, 1050);
+  ui_display->setMinimumSize(resolution);
 
   // Menu
   menu = menuBar();
@@ -93,13 +98,54 @@ resolution = QSize(1920, 1050);
   settingsMenu->addAction(contrastMinus);
   settingsMenu->addSeparator();
 
+  QAction* sharpnessPlus = new QAction("More sharpness");
+  QAction* sharpnessMinus = new QAction("Less sharpness");
+  sharpnessPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
+  sharpnessMinus->setShortcut(QKeySequence(tr("Ctrl+s")));
+  connect(sharpnessPlus, &QAction::triggered, [this](){
+    camera->setSharpness(camera->getSharpness() + 1);
+  });
+  connect(sharpnessMinus, &QAction::triggered, [this](){
+    camera->setSharpness(camera->getSharpness() - 1);
+  });
+  settingsMenu->addAction(sharpnessPlus);
+  settingsMenu->addAction(sharpnessMinus);
+  settingsMenu->addSeparator();
+
+  QAction* ISOPlus = new QAction("More ISO");
+  QAction* ISOMinus = new QAction("Less ISO");
+  ISOPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+I")));
+  ISOMinus->setShortcut(QKeySequence(tr("Ctrl+i")));
+  connect(ISOPlus, &QAction::triggered, [this](){
+    camera->setISO(camera->getISO() + 1);
+  });
+  connect(ISOMinus, &QAction::triggered, [this](){
+    camera->setISO(camera->getISO() - 1);
+  });
+  settingsMenu->addAction(ISOPlus);
+  settingsMenu->addAction(ISOMinus);
+  settingsMenu->addSeparator();
+
+  QAction* saturationPlus = new QAction("More saturation");
+  QAction* saturationMinus = new QAction("Less saturation");
+  saturationPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+A")));
+  saturationMinus->setShortcut(QKeySequence(tr("Ctrl+a")));
+  connect(saturationPlus, &QAction::triggered, [this](){
+    camera->setSaturation(camera->getSaturation() + 1);
+  });
+  connect(saturationMinus, &QAction::triggered, [this](){
+    camera->setSaturation(camera->getSaturation() - 1);
+  });
+  settingsMenu->addAction(saturationPlus);
+  settingsMenu->addAction(saturationMinus);
+  settingsMenu->addSeparator();
   menu->addMenu(settingsMenu);
 
   newCamera();
 
-  ui_control = new QFrame(ui_display);
-  ui_control->move(25, 50);
-  ui_button = new QPushButton(tr(""), ui_control);
+  //ui_control = new QFrame(ui_display);
+  //ui_control->move(25, 50);
+  //ui_button = new QPushButton(tr(""), ui_control);
 
 
 }
@@ -121,7 +167,18 @@ void Client::refreshParameters(){
   delete camera;
   QThread::sleep(3);
   newCamera();
-  QTimer::singleShot(1000, this, &QMainWindow::adjustSize);
+  ui_display->setMinimumSize(resolution);
+  ui_display->setMaximumSize(resolution);
+  if (screenSize.width() < resolution.width() || screenSize.height() < resolution.height() ){
+    ui_scroll->setMaximumSize(screenSize);
+    this->setMinimumSize(screenSize);
+  }
+  else {
+    ui_scroll->setMaximumSize(resolution);
+    this->setMinimumSize(resolution);
+  }
+  this->adjustSize();
+  this->setWindowState(Qt::WindowMinimized|Qt::WindowActive);
 }
 
 void Client::refreshDisplay(unsigned char *data){

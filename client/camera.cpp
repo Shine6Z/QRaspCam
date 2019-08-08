@@ -2,17 +2,17 @@
 
 void Camera::start(){
   if (camera->open()){
-    data=new unsigned char[  camera->getImageTypeSize ( raspicam::RASPICAM_FORMAT_GRAY )];
+    data = new unsigned char[  camera->getImageTypeSize ( raspicam::RASPICAM_FORMAT_GRAY )];
     grab();
   }
 }
 
 void Camera::grab(){
-    camera->grab();
-    camera->retrieve(data, raspicam::RASPICAM_FORMAT_GRAY);
-    emit(newImage(data));
-    QTimer::singleShot(0, this, &Camera::grab);
-
+    while(true){
+      camera->grab();
+      camera->retrieve(data, raspicam::RASPICAM_FORMAT_GRAY);
+      emit(newImage(data));
+    }
 }
 
 Camera::Camera(QSize resolution) : QObject(){
@@ -22,6 +22,15 @@ Camera::Camera(QSize resolution) : QObject(){
   camera->setHeight(resolution.height());
   camera->setSensorMode(raspicam::RASPICAM_EXPOSURE_AUTO);
   camera->setImageEffect(raspicam::RASPICAM_IMAGE_EFFECT_NONE);
+  if(resolution.width() >= 1500){
+    camera->setFrameRate(10);
+  }
+  else if(resolution.width() < 1500 && resolution.width() > 1000){
+    camera->setFrameRate(15);
+  }
+  else if(resolution.width() <= 1000 ){
+    camera->setFrameRate(60);
+  }
 }
 
 Camera::~Camera(){
@@ -45,4 +54,31 @@ void Camera::setContrast(int contrast){
 int Camera::getContrast(){
   int contrast = camera->getContrast();
   return contrast;
+}
+    
+void Camera::setSharpness(int sharpness){
+  camera->setSharpness(sharpness);
+}
+
+int Camera::getSharpness(){
+  int sharpness = camera->getSharpness();
+  return sharpness;
+}
+
+void Camera::setISO(int ISO){
+  camera->setISO(ISO);
+}
+
+int Camera::getISO(){
+  int ISO = camera->getISO();
+  return ISO;
+}
+
+void Camera::setSaturation(int saturation){
+  camera->setSaturation(saturation);
+}
+
+int Camera::getSaturation(){
+  int saturation = camera->getSaturation();
+  return saturation;
 }

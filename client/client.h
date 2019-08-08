@@ -10,8 +10,11 @@
 #include <QSize>
 #include <QAction>
 #include <QKeySequence>
+#include <QScrollArea>
 #include <QPushButton>
 #include <QMainWindow>
+#include <QDesktopWidget>
+#include <QDesktopWidget>
 
 #include "camera.h"
 
@@ -27,7 +30,9 @@ void refreshParameters();
 
   private:
 
+    QSize screenSize;
     QFrame* ui_control;
+    QScrollArea* ui_scroll;
     QLabel* ui_display;
     QMenuBar* menu;
     QPushButton* ui_button;

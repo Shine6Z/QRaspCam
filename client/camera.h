@@ -22,6 +22,12 @@ class Camera : public QObject{
     int getBrightness();
     void setContrast(int contrast);
     int getContrast();
+    void setSharpness(int sharpness);
+    int getSharpness();
+    void setISO(int ISO);
+    int getISO();
+    void setSaturation(int saturation);
+    int getSaturation();
 
   private:
     raspicam::RaspiCam* camera;
