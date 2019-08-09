@@ -5,7 +5,6 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
   QRect screen = QDesktopWidget().availableGeometry(this);
   screenSize = QSize(screen.width(), screen.height());
   this->setMaximumSize(screenSize);
-  this->setWindowState(Qt::WindowMaximized);
 
   // Window
   ui_scroll = new QScrollArea(this);
@@ -141,6 +140,33 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
   settingsMenu->addSeparator();
   menu->addMenu(settingsMenu);
 
+  QMenu *actionsMenu = new QMenu("Actions");
+
+  QAction* takeScreenshot = new QAction("Screenshot");
+  takeScreenshot->setShortcut(QKeySequence(tr("s")));
+  connect(takeScreenshot, &QAction::triggered, this, &Client::screenshot);
+  actionsMenu->addAction(takeScreenshot);
+
+  record = false;
+  QAction* recordAction = new QAction("Record");
+  recordAction->setShortcut(QKeySequence(tr("Shift+r")));
+  recordAction->setCheckable(true);
+  connect(recordAction, &QAction::triggered, [this](bool state){
+    this->record = state;
+    if(this->record){
+      QDateTime date = QDateTime::currentDateTime();
+       this->savePath = QDir::homePath() + "/Videos/" + date.toString("dd_mm_yyyy") + "/" + date.toString("hh:mm:ss:zzz");
+      if(!QDir(this->savePath).exists()) {QDir().mkpath(this->savePath);}
+      this->writer = new QImageWriter();
+    }
+    else {
+      delete writer;
+    }
+    imageNumber = 0;
+  });
+  actionsMenu->addAction(recordAction);
+  menu->addMenu(actionsMenu);
+
   newCamera();
 
   //ui_control = new QFrame(ui_display);
@@ -185,5 +211,19 @@ void Client::refreshDisplay(unsigned char *data){
 
 QPixmap image = QPixmap::fromImage(QImage(data, resolution.width(), resolution.height(), QImage::Format_Grayscale8));
 ui_display->setPixmap(image);
+
+if(record){
+  writer->setFileName(savePath + "/frame" + QString("%1").arg(imageNumber, 6, 10, QChar('0')) + ".pgm");
+  writer->write(image.toImage());
+  imageNumber++;
+  qInfo() << imageNumber << savePath;
+}
+}
+
+void Client::screenshot(){
+  QString date = QDateTime::currentDateTime().toString("dd:MM:yyyy:hh:mm:ss:zzz");
+  QString path = QDir::homePath() + "/Pictures/" + date + ".pgm";
+  QImageWriter writer(path);
+  writer.write(ui_display->pixmap()->toImage());
 
 }

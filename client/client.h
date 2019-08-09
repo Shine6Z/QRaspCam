@@ -15,6 +15,9 @@
 #include <QMainWindow>
 #include <QDesktopWidget>
 #include <QDesktopWidget>
+#include <QImageWriter>
+#include <QDateTime>
+#include <QDir>
 
 #include "camera.h"
 
@@ -27,6 +30,7 @@ class Client : public QMainWindow{
 void refreshDisplay(unsigned char *data);
 void newCamera();
 void refreshParameters();
+void screenshot();
 
   private:
 
@@ -39,6 +43,10 @@ void refreshParameters();
     Camera* camera;
     QSize resolution;
     QThread* cameraThread;
+    QImageWriter* writer;
+    QString savePath;
+    bool record;
+    unsigned int imageNumber;
 };
 
 #endif
