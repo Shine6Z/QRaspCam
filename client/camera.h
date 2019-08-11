@@ -28,11 +28,15 @@ class Camera : public QObject{
     int getISO();
     void setSaturation(int saturation);
     int getSaturation();
+    void setExposureMode(int mode);
+    void setExposure(int value);
+    int getExposure();
 
   private:
     raspicam::RaspiCam* camera;
     raspicam::RASPICAM_FORMAT color;
     unsigned char *data;
+    int exposureCompensation;
 
   signals:
   void newImage(unsigned char *data);

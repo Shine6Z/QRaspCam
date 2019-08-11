@@ -149,6 +149,38 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
   settingsMenu->addSeparator();
   menu->addMenu(settingsMenu);
 
+  QMenu *exposureMenu = new QMenu("Exposure");
+  QStringList exposureMode = { "Off", "Auto", "Night", "Night Preview", "Backlight", "Spotlight", "Sport", "Snow", "Beach", "Very Long", "Fixed FPS", "Antishake", "Fireworks" };
+  menu->addMenu(exposureMenu);
+  for(int i = 0; i < exposureMode.length(); i++){
+    QAction* action = new QAction(exposureMode[i]);
+    action->setCheckable(true);
+    connect(action, &QAction::triggered, [this, exposureMenu, action, exposureMode, i](){
+      camera->setExposureMode(i);
+      foreach (QAction* act, exposureMenu->actions()){
+        act->setChecked(false);
+      }
+      action->setChecked(true);
+    });
+    exposureMenu->addAction(action);
+  }
+  exposureMenu->actions()[1]->setChecked(true);
+  exposureMenu->addSeparator();
+  QAction* expPlus = new QAction("More exposure compensation");
+  QAction* expMinus = new QAction("Less exposureCompensation");
+  expPlus->setShortcut(QKeySequence(tr("Ctrl+Shift+E")));
+  expMinus->setShortcut(QKeySequence(tr("Ctrl+E")));
+  connect(expPlus, &QAction::triggered, [this](){
+    camera->setExposure(camera->getExposure() + 1);
+  });
+  connect(expMinus, &QAction::triggered, [this](){
+    camera->setExposure(camera->getExposure() - 1);
+  });
+  exposureMenu->addAction(expPlus);
+  exposureMenu->addAction(expMinus);
+
+
+
   QMenu *actionsMenu = new QMenu("Actions");
 
   QAction* takeScreenshot = new QAction("Screenshot");

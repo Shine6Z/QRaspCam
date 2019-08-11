@@ -27,6 +27,8 @@ Camera::Camera(QSize resolution, bool isColored) : QObject(){
   camera->setWidth(resolution.width());
   camera->setHeight(resolution.height());
   camera->setSensorMode(raspicam::RASPICAM_EXPOSURE_AUTO);
+  exposureCompensation = 0;
+  camera->setExposureCompensation(exposureCompensation);
   camera->setImageEffect(raspicam::RASPICAM_IMAGE_EFFECT_NONE);
   if(resolution.width() >= 1500){
     camera->setFrameRate(10);
@@ -87,4 +89,16 @@ void Camera::setSaturation(int saturation){
 int Camera::getSaturation(){
   int saturation = camera->getSaturation();
   return saturation;
+}
+
+void Camera::setExposureMode(int mode){
+  camera->setExposure(raspicam::RASPICAM_EXPOSURE(mode));
+}
+
+void Camera::setExposure(int value){
+  camera->setExposureCompensation(value);
+}
+
+int Camera::getExposure(){
+  return exposureCompensation;
 }

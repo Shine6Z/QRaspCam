@@ -17,6 +17,7 @@
 #include <QDesktopWidget>
 #include <QImageWriter>
 #include <QDateTime>
+#include <QStringList>
 #include <QDir>
 
 #include "camera.h"
