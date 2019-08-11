@@ -2,7 +2,7 @@
 
 void Camera::start(){
   if (camera->open()){
-    data = new unsigned char[  camera->getImageTypeSize ( raspicam::RASPICAM_FORMAT_GRAY )];
+    data = new unsigned char[  camera->getImageTypeSize ( color )];
     grab();
   }
 }
@@ -10,14 +10,20 @@ void Camera::start(){
 void Camera::grab(){
     while(true){
       camera->grab();
-      camera->retrieve(data, raspicam::RASPICAM_FORMAT_GRAY);
+      camera->retrieve(data, color);
       emit(newImage(data));
     }
 }
 
-Camera::Camera(QSize resolution) : QObject(){
+Camera::Camera(QSize resolution, bool isColored) : QObject(){
+  if (isColored){
+    color = raspicam::RASPICAM_FORMAT_RGB;
+  }
+  else{
+    color = raspicam::RASPICAM_FORMAT_GRAY;
+  }
   camera = new raspicam::RaspiCam;
-  camera->setFormat(raspicam::RASPICAM_FORMAT_GRAY);
+  camera->setFormat(color);
   camera->setWidth(resolution.width());
   camera->setHeight(resolution.height());
   camera->setSensorMode(raspicam::RASPICAM_EXPOSURE_AUTO);

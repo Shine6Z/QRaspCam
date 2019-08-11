@@ -12,7 +12,7 @@ class Camera : public QObject{
   Q_OBJECT
 
   public:
-    explicit Camera(QSize resolution = QSize(1920, 1050));
+    explicit Camera(QSize resolution = QSize(1920, 1050), bool isColored=false);
     ~Camera();
     void grab();
 
@@ -31,6 +31,7 @@ class Camera : public QObject{
 
   private:
     raspicam::RaspiCam* camera;
+    raspicam::RASPICAM_FORMAT color;
     unsigned char *data;
 
   signals:

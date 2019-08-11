@@ -42,6 +42,7 @@ void screenshot();
     QPushButton* ui_button;
     Camera* camera;
     QSize resolution;
+    bool isColored;
     QThread* cameraThread;
     QImageWriter* writer;
     QString savePath;

@@ -14,6 +14,7 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
 
   resolution = QSize(1920, 1050);
   ui_display->setMinimumSize(resolution);
+  isColored = false;
 
   // Menu
   menu = menuBar();
@@ -23,12 +24,15 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
   QAction* res1080 = new QAction("1080p");
   QAction* res720 = new QAction("720p");
   QAction* resLow = new QAction("Low");
+  QAction* colored = new QAction("Colored");
 
   resUltra->setCheckable(true);
   res1080->setCheckable(true);
   res720->setCheckable(true);
   resLow->setCheckable(true);
   res1080->setChecked(true);
+  colored->setCheckable(true);
+  colored->setChecked(false);
 
   connect(resUltra, &QAction::triggered, [this, resUltra, res1080, res720, resLow](){
     resolution = QSize(2592, 1944);
@@ -58,11 +62,16 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
     res720->setChecked(false);
     resUltra->setChecked(false);
   });
+  connect(colored, &QAction::triggered, [this](bool isChecked){
+    isColored = isChecked;
+    refreshParameters();
+  });
 
   resolutionMenu->addAction(resUltra);
   resolutionMenu->addAction(res1080);
   resolutionMenu->addAction(res720);
   resolutionMenu->addAction(resLow);
+  resolutionMenu->addAction(colored);
 
   menu->addMenu(resolutionMenu);
 
@@ -179,7 +188,7 @@ Client::Client(QWidget *parent) : QMainWindow(parent){
 void Client::newCamera(){ 
 
   cameraThread = new QThread;
-  camera = new Camera(resolution);
+  camera = new Camera(resolution, isColored);
   camera->moveToThread(cameraThread);
   connect(cameraThread, SIGNAL(started()), camera, SLOT(start()));
   connect(camera, &Camera::newImage, this, &Client::refreshDisplay);
@@ -190,8 +199,9 @@ void Client::newCamera(){
 }
 
 void Client::refreshParameters(){
+  disconnect(camera, &Camera::newImage, this, &Client::refreshDisplay);
   delete camera;
-  QThread::sleep(3);
+  //QThread::sleep(10);
   newCamera();
   ui_display->setMinimumSize(resolution);
   ui_display->setMaximumSize(resolution);
@@ -209,11 +219,17 @@ void Client::refreshParameters(){
 
 void Client::refreshDisplay(unsigned char *data){
 
-QPixmap image = QPixmap::fromImage(QImage(data, resolution.width(), resolution.height(), QImage::Format_Grayscale8));
+QPixmap image;
+if(isColored){
+  image = QPixmap::fromImage(QImage(data, resolution.width(), resolution.height(), QImage::Format_RGB888));
+}
+else{
+  image = QPixmap::fromImage(QImage(data, resolution.width(), resolution.height(), QImage::Format_Grayscale8));
+}
 ui_display->setPixmap(image);
 
 if(record){
-  writer->setFileName(savePath + "/frame" + QString("%1").arg(imageNumber, 6, 10, QChar('0')) + ".pgm");
+  writer->setFileName(savePath + "/frame" + QString("%1").arg(imageNumber, 6, 10, QChar('0')) + ".png");
   writer->write(image.toImage());
   imageNumber++;
   qInfo() << imageNumber << savePath;
@@ -222,7 +238,7 @@ if(record){
 
 void Client::screenshot(){
   QString date = QDateTime::currentDateTime().toString("dd:MM:yyyy:hh:mm:ss:zzz");
-  QString path = QDir::homePath() + "/Pictures/" + date + ".pgm";
+  QString path = QDir::homePath() + "/Pictures/" + date + ".png";
   QImageWriter writer(path);
   writer.write(ui_display->pixmap()->toImage());
 
