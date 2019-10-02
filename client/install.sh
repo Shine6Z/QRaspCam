@@ -9,8 +9,8 @@ sudo make install
 sudo ldconfig
 cd ..
 rm -rf raspicam
-git clone https://github.com/bgallois/FDS2019.git
-cd client/
+git clone https://github.com/bgallois/QRaspCam.git
+cd QRaspCam/client/
 qmake client.pro
 make
 sudo cp client /usr/local/bin/
